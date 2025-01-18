@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/chenmuyao/url_shortener/config"
+	"github.com/chenmuyao/url_shortener/internal/repo"
 	"github.com/chenmuyao/url_shortener/internal/service"
 	"github.com/chenmuyao/url_shortener/internal/web"
 	"github.com/go-playground/validator/v10"
@@ -26,7 +27,8 @@ func main() {
 
 	v := validator.New(validator.WithRequiredStructEnabled())
 
-	svc := service.NewUrlShortenerSvc()
+	repo := repo.NewUrlShortenerRepo()
+	svc := service.NewUrlShortenerSvc(repo)
 	url := web.NewUrlShortenerHdl(v, svc)
 
 	// init web server
