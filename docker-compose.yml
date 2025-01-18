@@ -10,10 +10,10 @@ services:
       - 25432:5432
 
   url_shortener:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+    image: vinchent123/url_shortener:v0.0.1
     restart: always
     deploy:
       mode: replicated
       replicas: 1
+    ports:
+      - 23000:3000

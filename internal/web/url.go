@@ -85,5 +85,7 @@ func (u *UrlShortenerHdl) GetFull(c *fiber.Ctx) error {
 		return c.SendStatus(http.StatusNotFound)
 	}
 
+	slog.Debug("Got full url", slog.Any("url", full))
+
 	return c.Redirect(full)
 }

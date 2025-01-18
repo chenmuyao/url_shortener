@@ -14,6 +14,7 @@ import (
 	"github.com/go-playground/validator/v10"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/pprof"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -35,6 +36,8 @@ func main() {
 
 	// init web server
 	app := fiber.New()
+
+	app.Use(pprof.New())
 
 	url.RegisterHandlers(app)
 
