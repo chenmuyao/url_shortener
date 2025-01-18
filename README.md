@@ -18,7 +18,8 @@ a simple url shortener service written in Go
 - DB: `PostgreSQL`
 - DB toolchain: `migrate`, `sqlc`
 - Container/Orchestration: Docker/Docker compose
-- stress test: `wrk`
+- Stress test: `wrk`
+- Profiling: `pprof`
 
 ## Stress test results
 
@@ -113,3 +114,6 @@ we have reduced a level of abstraction that "does nothing". But the
 inconvenience is that in `repo` level, we depend on `pgConn.pgError` that has
 to be changed if we change to another middleware like `GORM`. But it is
 acceptable for the sake of simplicity.
+- After adding the click count feature, it seems that I touched the limit of
+the database. One way to improve that is to asynchronously write the count
+by using a message queue.
