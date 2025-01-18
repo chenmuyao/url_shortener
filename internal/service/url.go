@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/chenmuyao/url_shortener/internal/domain"
 	"github.com/chenmuyao/url_shortener/internal/repo"
 )
 
@@ -13,8 +14,8 @@ const base62Alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrst
 type UrlShortenerSvc interface {
 	// Shorten takes the full url and returns a short url
 	Shorten(ctx context.Context, fullUrl string) (string, error)
-	// GetFull takes a shortID and returns the full url
-	GetFull(ctx context.Context, shortID string) (string, error)
+	// GetCount takes a shortID and returns the domain URL
+	GetURL(ctx context.Context, shortID string) (domain.Url, error)
 }
 
 type urlShortenerSvc struct {
@@ -22,10 +23,10 @@ type urlShortenerSvc struct {
 }
 
 // GetFull implements UrlShortenerSvc.
-func (u *urlShortenerSvc) GetFull(ctx context.Context, shortID string) (string, error) {
+func (u *urlShortenerSvc) GetURL(ctx context.Context, shortID string) (domain.Url, error) {
 	id, err := base62Dec(shortID)
 	if err != nil {
-		return "", err
+		return domain.Url{}, err
 	}
 	return u.repo.GetURL(ctx, id)
 }

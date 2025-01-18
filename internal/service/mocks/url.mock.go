@@ -13,6 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	domain "github.com/chenmuyao/url_shortener/internal/domain"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -40,19 +41,19 @@ func (m *MockUrlShortenerSvc) EXPECT() *MockUrlShortenerSvcMockRecorder {
 	return m.recorder
 }
 
-// GetFull mocks base method.
-func (m *MockUrlShortenerSvc) GetFull(ctx context.Context, shortID string) (string, error) {
+// GetURL mocks base method.
+func (m *MockUrlShortenerSvc) GetURL(ctx context.Context, shortID string) (domain.Url, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFull", ctx, shortID)
-	ret0, _ := ret[0].(string)
+	ret := m.ctrl.Call(m, "GetURL", ctx, shortID)
+	ret0, _ := ret[0].(domain.Url)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetFull indicates an expected call of GetFull.
-func (mr *MockUrlShortenerSvcMockRecorder) GetFull(ctx, shortID any) *gomock.Call {
+// GetURL indicates an expected call of GetURL.
+func (mr *MockUrlShortenerSvcMockRecorder) GetURL(ctx, shortID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFull", reflect.TypeOf((*MockUrlShortenerSvc)(nil).GetFull), ctx, shortID)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetURL", reflect.TypeOf((*MockUrlShortenerSvc)(nil).GetURL), ctx, shortID)
 }
 
 // Shorten mocks base method.

@@ -32,6 +32,7 @@ func NewUrlShortenerHdl(v *validator.Validate, svc service.UrlShortenerSvc) *Url
 func (u *UrlShortenerHdl) RegisterHandlers(s *fiber.App) {
 	s.Post("/", u.SetUrl)
 	s.Get("/:short", u.GetFull)
+	s.Get("/:short/count", u.GetCount)
 }
 
 func (u *UrlShortenerHdl) SetUrl(c *fiber.Ctx) error {
@@ -80,12 +81,25 @@ func (u *UrlShortenerHdl) SetUrl(c *fiber.Ctx) error {
 func (u *UrlShortenerHdl) GetFull(c *fiber.Ctx) error {
 	short := c.Params("short")
 
-	full, err := u.svc.GetFull(c.Context(), short)
+	url, err := u.svc.GetURL(c.Context(), short)
 	if err != nil {
 		return c.SendStatus(http.StatusNotFound)
 	}
 
-	slog.Debug("Got full url", slog.Any("url", full))
+	slog.Debug("Got full url", slog.Any("url", url.Url))
 
-	return c.Redirect(full)
+	return c.Redirect(url.Url)
+}
+
+func (u *UrlShortenerHdl) GetCount(c *fiber.Ctx) error {
+	short := c.Params("short")
+
+	url, err := u.svc.GetURL(c.Context(), short)
+	if err != nil {
+		return c.SendStatus(http.StatusNotFound)
+	}
+
+	slog.Debug("Got full url", slog.Any("url", url.Url), slog.Any("count", url.Count))
+
+	return c.Status(http.StatusOK).JSON(url)
 }

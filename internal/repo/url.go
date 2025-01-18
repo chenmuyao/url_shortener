@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/chenmuyao/url_shortener/internal/domain"
 	"github.com/chenmuyao/url_shortener/internal/repo/dao"
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -12,7 +13,7 @@ const keyConflictSQLCode = "23505"
 
 type UrlShortenerRepo interface {
 	InsertURL(ctx context.Context, full string) (int64, error)
-	GetURL(ctx context.Context, id int64) (string, error)
+	GetURL(ctx context.Context, id int64) (domain.Url, error)
 }
 
 type urlShortenerRepo struct {
@@ -20,9 +21,9 @@ type urlShortenerRepo struct {
 }
 
 // GetURL implements UrlShortenerRepo.
-func (u *urlShortenerRepo) GetURL(ctx context.Context, id int64) (string, error) {
+func (u *urlShortenerRepo) GetURL(ctx context.Context, id int64) (domain.Url, error) {
 	res, err := u.dao.UpdateCountByID(ctx, id)
-	return res.Url, err
+	return domain.Url(res), err
 }
 
 // InsertURL implements UrlShortenerRepo.
