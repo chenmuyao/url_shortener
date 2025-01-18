@@ -7,13 +7,16 @@ import (
 	"time"
 
 	"github.com/chenmuyao/url_shortener/config"
+	"github.com/chenmuyao/url_shortener/internal/service"
 	"github.com/chenmuyao/url_shortener/internal/web"
+	"github.com/go-playground/validator/v10"
 
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func main() {
+	slog.SetLogLoggerLevel(slog.LevelDebug)
 	// init DB
 	_, err := initDB()
 	if err != nil {
@@ -21,7 +24,10 @@ func main() {
 	}
 	slog.Info("DB init")
 
-	url := web.NewUrlShortenerHdl()
+	v := validator.New(validator.WithRequiredStructEnabled())
+
+	svc := service.NewUrlShortenerSvc()
+	url := web.NewUrlShortenerHdl(v, svc)
 
 	// init web server
 	app := fiber.New()

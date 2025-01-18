@@ -2,6 +2,7 @@
 # docker
 # migrate
 # sqlc
+# mockgen
 
 all: dev
 
@@ -17,7 +18,8 @@ stop: down clean
 
 .PHONY: test
 test:
-	@go test ./...
+	@mockgen -source=./internal/service/url.go -package=urlsvcmock -destination=./internal/service/mocks/url.mock.go
+	@go test -cover ./...
 
 .PHONY: dev
 dev: clean

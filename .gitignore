@@ -26,3 +26,4 @@ go.work.sum
 
 # custom
 url_shortener
+coverage.html
