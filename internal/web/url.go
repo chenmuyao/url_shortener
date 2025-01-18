@@ -78,5 +78,12 @@ func (u *UrlShortenerHdl) SetUrl(c *fiber.Ctx) error {
 }
 
 func (u *UrlShortenerHdl) GetFull(c *fiber.Ctx) error {
-	return c.SendString("GET")
+	short := c.Params("short")
+
+	full, err := u.svc.GetFull(c.Context(), short)
+	if err != nil {
+		return c.SendStatus(http.StatusNotFound)
+	}
+
+	return c.Redirect(full)
 }

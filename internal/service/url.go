@@ -23,7 +23,11 @@ type urlShortenerSvc struct {
 
 // GetFull implements UrlShortenerSvc.
 func (u *urlShortenerSvc) GetFull(ctx context.Context, shortID string) (string, error) {
-	return "http://www.example.com", nil
+	id, err := base62Dec(shortID)
+	if err != nil {
+		return "", err
+	}
+	return u.repo.GetURL(ctx, id)
 }
 
 // Shorten implements UrlShortenerSvc.
