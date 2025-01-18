@@ -8,3 +8,9 @@ services:
       POSTGRES_DB: url_shortener
     ports:
       - 25432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 28080:8080

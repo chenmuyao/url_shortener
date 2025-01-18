@@ -1,1 +1,2 @@
-DROP TABLE urls;
+DROP TABLE IF EXISTS "urls";
+DROP SEQUENCE IF EXISTS urls_id_seq;

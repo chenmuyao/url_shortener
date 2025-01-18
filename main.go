@@ -8,6 +8,7 @@ import (
 
 	"github.com/chenmuyao/url_shortener/config"
 	"github.com/chenmuyao/url_shortener/internal/repo"
+	"github.com/chenmuyao/url_shortener/internal/repo/dao"
 	"github.com/chenmuyao/url_shortener/internal/service"
 	"github.com/chenmuyao/url_shortener/internal/web"
 	"github.com/go-playground/validator/v10"
@@ -19,7 +20,7 @@ import (
 func main() {
 	slog.SetLogLoggerLevel(slog.LevelDebug)
 	// init DB
-	_, err := initDB()
+	dbConn, err := initDB()
 	if err != nil {
 		panic(err)
 	}
@@ -27,7 +28,8 @@ func main() {
 
 	v := validator.New(validator.WithRequiredStructEnabled())
 
-	repo := repo.NewUrlShortenerRepo()
+	dao := dao.New(dbConn)
+	repo := repo.NewUrlShortenerRepo(dao)
 	svc := service.NewUrlShortenerSvc(repo)
 	url := web.NewUrlShortenerHdl(v, svc)
 

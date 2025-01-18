@@ -24,11 +24,13 @@ test:
 .PHONY: dev
 dev: clean
 	@go mod tidy
+	@sqlc generate
 	@go build -v -o url_shortener .
 
 .PHONY: docker
 docker: clean
 	@go mod tidy
+	@sqlc generate
 	@GOOS=linux GOARCH=arm go build --tags=docker -o url_shortener .
 	@docker rmi -f vinchent123/url_shortener:v0.0.1
 	@docker build -t vinchent123/url_shortener:v0.0.1 .
