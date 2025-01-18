@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/chenmuyao/url_shortener/config"
+	"github.com/chenmuyao/url_shortener/internal/web"
 
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -20,12 +21,16 @@ func main() {
 	}
 	slog.Info("DB init")
 
+	url := web.NewUrlShortenerHdl()
+
 	// init web server
 	app := fiber.New()
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
+	url.RegisterHandlers(app)
+
+	// app.Get("/", func(c *fiber.Ctx) error {
+	// 	return c.SendString("Hello, World!")
+	// })
 
 	app.Listen(":3000")
 }
