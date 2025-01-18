@@ -4,7 +4,13 @@
 
 package dao
 
+import (
+	"time"
+)
+
 type Url struct {
-	ID  int64
-	Url string
+	ID        int64
+	Url       string
+	CreatedAt time.Time
+	Count     int64
 }

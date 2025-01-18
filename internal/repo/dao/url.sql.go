@@ -7,20 +7,8 @@ package dao
 
 import (
 	"context"
+	"time"
 )
-
-const getByID = `-- name: GetByID :one
-SELECT (url)
-FROM "urls"
-WHERE "id" = ($1)
-`
-
-func (q *Queries) GetByID(ctx context.Context, id int64) (string, error) {
-	row := q.db.QueryRowContext(ctx, getByID, id)
-	var url string
-	err := row.Scan(&url)
-	return url, err
-}
 
 const getIDByURL = `-- name: GetIDByURL :one
 SELECT (id)
@@ -36,12 +24,42 @@ func (q *Queries) GetIDByURL(ctx context.Context, url string) (int64, error) {
 }
 
 const insertURL = `-- name: InsertURL :one
-INSERT INTO "urls" (url) VALUES ($1) RETURNING id, url
+INSERT INTO "urls" (url, created_at, count) VALUES ($1, $2, $3) RETURNING id, url, created_at, count
 `
 
-func (q *Queries) InsertURL(ctx context.Context, url string) (Url, error) {
-	row := q.db.QueryRowContext(ctx, insertURL, url)
+type InsertURLParams struct {
+	Url       string
+	CreatedAt time.Time
+	Count     int64
+}
+
+func (q *Queries) InsertURL(ctx context.Context, arg InsertURLParams) (Url, error) {
+	row := q.db.QueryRowContext(ctx, insertURL, arg.Url, arg.CreatedAt, arg.Count)
 	var i Url
-	err := row.Scan(&i.ID, &i.Url)
+	err := row.Scan(
+		&i.ID,
+		&i.Url,
+		&i.CreatedAt,
+		&i.Count,
+	)
+	return i, err
+}
+
+const updateCountByID = `-- name: UpdateCountByID :one
+UPDATE "urls"
+SET count = urls.count + 1
+WHERE "id" = ($1)
+RETURNING id, url, created_at, count
+`
+
+func (q *Queries) UpdateCountByID(ctx context.Context, id int64) (Url, error) {
+	row := q.db.QueryRowContext(ctx, updateCountByID, id)
+	var i Url
+	err := row.Scan(
+		&i.ID,
+		&i.Url,
+		&i.CreatedAt,
+		&i.Count,
+	)
 	return i, err
 }

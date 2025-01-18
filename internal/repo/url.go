@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"time"
 
 	"github.com/chenmuyao/url_shortener/internal/repo/dao"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -20,12 +21,17 @@ type urlShortenerRepo struct {
 
 // GetURL implements UrlShortenerRepo.
 func (u *urlShortenerRepo) GetURL(ctx context.Context, id int64) (string, error) {
-	return u.dao.GetByID(ctx, id)
+	res, err := u.dao.UpdateCountByID(ctx, id)
+	return res.Url, err
 }
 
 // InsertURL implements UrlShortenerRepo.
 func (u *urlShortenerRepo) InsertURL(ctx context.Context, full string) (int64, error) {
-	url, err := u.dao.InsertURL(ctx, full)
+	url, err := u.dao.InsertURL(ctx, dao.InsertURLParams{
+		Url:       full,
+		CreatedAt: time.Now(),
+		Count:     0,
+	})
 	if err != nil {
 		return u.handleExisted(ctx, full, err)
 	}
