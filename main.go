@@ -25,6 +25,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer dbConn.Close()
 	slog.Info("DB init")
 
 	v := validator.New(validator.WithRequiredStructEnabled())
