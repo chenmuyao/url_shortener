@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/chenmuyao/url_shortener/config"
 	"github.com/chenmuyao/url_shortener/internal/service"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -26,7 +27,7 @@ type UrlShortenerHdl struct {
 }
 
 func NewUrlShortenerHdl(v *validator.Validate, svc service.UrlShortenerSvc) *UrlShortenerHdl {
-	return &UrlShortenerHdl{validate: v, svc: svc, baseURL: "http://localhost:3000"}
+	return &UrlShortenerHdl{validate: v, svc: svc, baseURL: config.App.BaseURL}
 }
 
 func (u *UrlShortenerHdl) RegisterHandlers(s *fiber.App) {

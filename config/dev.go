@@ -12,3 +12,7 @@ var DB = DBConfig{
 var Redis = RedisConfig{
 	Addr: "localhost:26379",
 }
+
+var App = Application{
+	BaseURL: "http://localhost:3000",
+}

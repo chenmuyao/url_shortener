@@ -10,3 +10,7 @@ type DBConfig struct {
 type RedisConfig struct {
 	Addr string
 }
+
+type Application struct {
+	BaseURL string
+}
