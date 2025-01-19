@@ -115,6 +115,43 @@ So I switched to snowflake in order to generate global unique ID, so that
 we can scale more easily and always have a link like:
 `http://localhost:3000/2EwYPl5Nzw8`
 
+### V3 Use redis as message queue
+
+I've chosen redis for the simplicity, because I only need to communicate the
+ID. This logic can eventually evolve and we could use a proper message queue 
+at that moment.
+
+With async sending the message, we reached 10000 QPS for the GET handler. It's
+about more than x10 performance improvements.
+
+What we sacrificed here though, is the real-time count result. Since we started
+a tity consumer that update the counter to not saturate the database, we
+could experience significant message backlog.
+
+We can eventually adjust the number of consumers (or connections) with the GET handler's
+performance and find a balance.
+
+```bash
+<@url_shortener>-<⎇ main>-<±>-> wrk -t2 -d30s -c10 -s ./scripts/wrk/get.lua http://localhost:3000/2EwYPl5Nzw8
+Running 30s test @ http://localhost:3000/2EwYPl5Nzw8
+  2 threads and 10 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.53ms    3.05ms  42.24ms   94.57%
+    Req/Sec     5.35k     1.68k    8.30k    68.00%
+  319219 requests in 30.01s, 32.88MB read
+Requests/sec:  10637.15
+Transfer/sec:      1.10MB
+<@url_shortener>-<⎇ main>-<±>-> wrk -t2 -d30s -c10 -s ./scripts/wrk/get.lua http://localhost:3000/2EwYPl5Nzw8
+Running 30s test @ http://localhost:3000/2EwYPl5Nzw8
+  2 threads and 10 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     1.26ms    1.89ms  48.87ms   97.02%
+    Req/Sec     4.85k   765.03     7.57k    77.67%
+  289322 requests in 30.01s, 29.80MB read
+Requests/sec:   9642.03
+Transfer/sec:      0.99MB
+```
+
 ## Thoughts
 
 - I chose `Fiber` and `sqlc` because in another showcase project `secumon` I have

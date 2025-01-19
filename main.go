@@ -8,11 +8,13 @@ import (
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/chenmuyao/url_shortener/config"
+	"github.com/chenmuyao/url_shortener/internal/events"
 	"github.com/chenmuyao/url_shortener/internal/repo"
 	"github.com/chenmuyao/url_shortener/internal/repo/dao"
 	"github.com/chenmuyao/url_shortener/internal/service"
 	"github.com/chenmuyao/url_shortener/internal/web"
 	"github.com/go-playground/validator/v10"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
@@ -21,6 +23,7 @@ import (
 
 func main() {
 	slog.SetLogLoggerLevel(slog.LevelDebug)
+
 	// init DB
 	dbConn, err := initDB()
 	if err != nil {
@@ -28,6 +31,11 @@ func main() {
 	}
 	defer dbConn.Close()
 	slog.Info("DB init")
+
+	// init Redis
+	redis := redis.NewClient(&redis.Options{
+		Addr: config.Redis.Addr,
+	})
 
 	v := validator.New(validator.WithRequiredStructEnabled())
 
@@ -37,9 +45,14 @@ func main() {
 	}
 
 	dao := dao.New(dbConn)
-	repo := repo.NewUrlShortenerRepo(dao, node)
+	counter := events.NewRedisCountProducer(redis)
+	repo := repo.NewUrlShortenerRepo(node, dao, counter)
 	svc := service.NewUrlShortenerSvc(repo)
 	url := web.NewUrlShortenerHdl(v, svc)
+
+	// start consumer
+	c := events.NewRedisCountConsumer(dao, redis)
+	c.Start()
 
 	// init web server
 	app := fiber.New()

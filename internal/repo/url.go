@@ -2,10 +2,12 @@ package repo
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/chenmuyao/url_shortener/internal/domain"
+	"github.com/chenmuyao/url_shortener/internal/events"
 	"github.com/chenmuyao/url_shortener/internal/repo/dao"
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -18,13 +20,23 @@ type UrlShortenerRepo interface {
 }
 
 type urlShortenerRepo struct {
-	dao  *dao.Queries
-	node *snowflake.Node
+	dao     *dao.Queries
+	node    *snowflake.Node
+	counter events.CountProducer
 }
 
 // GetURL implements UrlShortenerRepo.
 func (u *urlShortenerRepo) GetURL(ctx context.Context, id int64) (domain.Url, error) {
-	res, err := u.dao.UpdateCountByID(ctx, id)
+	res, err := u.dao.GetURLByID(ctx, id)
+	go func() {
+		c, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		er := u.counter.AddCount(c, id)
+		if er != nil {
+			// NOTE: must be redis error, log and monitor here
+			slog.Error("cannot push add count message", slog.Any("id", id), slog.Any("err", er))
+		}
+	}()
 	return domain.Url(res), err
 }
 
@@ -61,6 +73,10 @@ func (u *urlShortenerRepo) handleExisted(
 	return 0, err
 }
 
-func NewUrlShortenerRepo(dao *dao.Queries, node *snowflake.Node) UrlShortenerRepo {
-	return &urlShortenerRepo{dao: dao, node: node}
+func NewUrlShortenerRepo(
+	node *snowflake.Node,
+	dao *dao.Queries,
+	counter events.CountProducer,
+) UrlShortenerRepo {
+	return &urlShortenerRepo{dao: dao, node: node, counter: counter}
 }

@@ -23,6 +23,24 @@ func (q *Queries) GetIDByURL(ctx context.Context, url string) (int64, error) {
 	return id, err
 }
 
+const getURLByID = `-- name: GetURLByID :one
+SELECT id, url, created_at, count
+FROM "urls"
+WHERE "id" = ($1)
+`
+
+func (q *Queries) GetURLByID(ctx context.Context, id int64) (Url, error) {
+	row := q.db.QueryRowContext(ctx, getURLByID, id)
+	var i Url
+	err := row.Scan(
+		&i.ID,
+		&i.Url,
+		&i.CreatedAt,
+		&i.Count,
+	)
+	return i, err
+}
+
 const insertURL = `-- name: InsertURL :one
 INSERT INTO "urls" (id, url, created_at, count) VALUES ($1, $2, $3, $4) RETURNING id, url, created_at, count
 `

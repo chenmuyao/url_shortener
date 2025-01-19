@@ -6,3 +6,7 @@ type DBConfig struct {
 	MaxIdleDbConn    int
 	MaxDbLifetimeSec int
 }
+
+type RedisConfig struct {
+	Addr string
+}

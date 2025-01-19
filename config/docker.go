@@ -8,3 +8,7 @@ var DB = DBConfig{
 	MaxIdleDbConn:    100,
 	MaxDbLifetimeSec: 10 * 60,
 }
+
+var Redis = RedisConfig{
+	Addr: "redis:6379",
+}

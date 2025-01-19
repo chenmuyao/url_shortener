@@ -9,6 +9,14 @@ services:
     ports:
       - 25432:5432
 
+  redis:
+    image: bitnami/redis:latest
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 26379:6379
+
   url_shortener:
     image: vinchent123/url_shortener:v0.0.1
     restart: always

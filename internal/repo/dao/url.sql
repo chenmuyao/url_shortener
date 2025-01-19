@@ -12,4 +12,8 @@ SELECT (id)
 FROM "urls"
 WHERE "url" = ($1);
 
+-- name: GetURLByID :one
+SELECT *
+FROM "urls"
+WHERE "id" = ($1);
 
