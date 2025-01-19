@@ -104,6 +104,17 @@ Requests/sec:    719.82
 Transfer/sec:     80.14KB
 ```
 
+### V2 Use snowflake UUID
+
+I saw 2 potential problems with autoincrement ID.
+
+1. It is too predictable, and not that random
+2. We depends on ONE database. It will be difficult to scale.
+
+So I switched to snowflake in order to generate global unique ID, so that
+we can scale more easily and always have a link like:
+`http://localhost:3000/2EwYPl5Nzw8`
+
 ## Thoughts
 
 - I chose `Fiber` and `sqlc` because in another showcase project `secumon` I have
@@ -117,3 +128,9 @@ acceptable for the sake of simplicity.
 - After adding the click count feature, it seems that I touched the limit of
 the database. One way to improve that is to asynchronously write the count
 by using a message queue.
+- There is another way to do that. That is to use a hashing algorithm like
+`murmurhash`. In case of hash conflict, we can prepend some special characters
+to the url to get a new hash. The logic might be a little more complex to
+handle the conflict, but since it should not happen a lot, we can accept that.
+The advantage is that we don't have to keep the index of the full url, which
+can be expensive when the DB grows.
