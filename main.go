@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/snowflake"
@@ -17,6 +18,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -57,7 +59,19 @@ func main() {
 	// init web server
 	app := fiber.New()
 
-	app.Use(pprof.New())
+	app.Use(pprof.New()).Use(cors.New(cors.Config{
+		AllowCredentials: true,
+		AllowHeaders:     "Content-Type",
+		AllowMethods:     "GET,POST",
+		AllowOriginsFunc: func(origin string) bool {
+			slog.Debug("origin", slog.Any("origin", origin))
+			if strings.HasPrefix(origin, "http://localhost") {
+				slog.Debug("will return true")
+				return true
+			}
+			return strings.Contains(origin, "vinchent.xyz")
+		},
+	}))
 
 	url.RegisterHandlers(app)
 

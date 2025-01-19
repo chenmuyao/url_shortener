@@ -37,8 +37,7 @@ func (u *UrlShortenerHdl) RegisterHandlers(s *fiber.App) {
 }
 
 func (u *UrlShortenerHdl) SetUrl(c *fiber.Ctx) error {
-	c.Accepts("application/json")
-
+	slog.Debug("set url")
 	// Check the input
 	var req FullUrlReq
 	err := json.Unmarshal(c.Body(), &req)
