@@ -41,11 +41,11 @@ clean:
 
 .PHONY: up_dev
 up_dev:
-	@docker compose -f docker-compose-dev.yml up -d
+	@docker compose -f docker-compose-dev.yml up -d --remove-orphans
 
 .PHONY: up
 up:
-	@docker compose up -d
+	@docker compose up -d --remove-orphans
 
 .PHONY: down
 down:

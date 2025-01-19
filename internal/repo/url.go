@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/bwmarrin/snowflake"
 	"github.com/chenmuyao/url_shortener/internal/domain"
 	"github.com/chenmuyao/url_shortener/internal/repo/dao"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -17,7 +18,8 @@ type UrlShortenerRepo interface {
 }
 
 type urlShortenerRepo struct {
-	dao *dao.Queries
+	dao  *dao.Queries
+	node *snowflake.Node
 }
 
 // GetURL implements UrlShortenerRepo.
@@ -28,7 +30,10 @@ func (u *urlShortenerRepo) GetURL(ctx context.Context, id int64) (domain.Url, er
 
 // InsertURL implements UrlShortenerRepo.
 func (u *urlShortenerRepo) InsertURL(ctx context.Context, full string) (int64, error) {
+	id := u.node.Generate().Int64()
+
 	url, err := u.dao.InsertURL(ctx, dao.InsertURLParams{
+		ID:        id,
 		Url:       full,
 		CreatedAt: time.Now(),
 		Count:     0,
@@ -56,6 +61,6 @@ func (u *urlShortenerRepo) handleExisted(
 	return 0, err
 }
 
-func NewUrlShortenerRepo(dao *dao.Queries) UrlShortenerRepo {
-	return &urlShortenerRepo{dao: dao}
+func NewUrlShortenerRepo(dao *dao.Queries, node *snowflake.Node) UrlShortenerRepo {
+	return &urlShortenerRepo{dao: dao, node: node}
 }

@@ -3,6 +3,7 @@ module github.com/chenmuyao/url_shortener
 go 1.23.1
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/jackc/pgx/v5 v5.5.4

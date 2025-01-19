@@ -1,5 +1,5 @@
 -- name: InsertURL :one
-INSERT INTO "urls" (url, created_at, count) VALUES ($1, $2, $3) RETURNING *;
+INSERT INTO "urls" (id, url, created_at, count) VALUES ($1, $2, $3, $4) RETURNING *;
 
 -- name: UpdateCountByID :one
 UPDATE "urls"

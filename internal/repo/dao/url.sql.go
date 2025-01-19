@@ -24,17 +24,23 @@ func (q *Queries) GetIDByURL(ctx context.Context, url string) (int64, error) {
 }
 
 const insertURL = `-- name: InsertURL :one
-INSERT INTO "urls" (url, created_at, count) VALUES ($1, $2, $3) RETURNING id, url, created_at, count
+INSERT INTO "urls" (id, url, created_at, count) VALUES ($1, $2, $3, $4) RETURNING id, url, created_at, count
 `
 
 type InsertURLParams struct {
+	ID        int64
 	Url       string
 	CreatedAt time.Time
 	Count     int64
 }
 
 func (q *Queries) InsertURL(ctx context.Context, arg InsertURLParams) (Url, error) {
-	row := q.db.QueryRowContext(ctx, insertURL, arg.Url, arg.CreatedAt, arg.Count)
+	row := q.db.QueryRowContext(ctx, insertURL,
+		arg.ID,
+		arg.Url,
+		arg.CreatedAt,
+		arg.Count,
+	)
 	var i Url
 	err := row.Scan(
 		&i.ID,

@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/bwmarrin/snowflake"
 	"github.com/chenmuyao/url_shortener/config"
 	"github.com/chenmuyao/url_shortener/internal/repo"
 	"github.com/chenmuyao/url_shortener/internal/repo/dao"
@@ -30,8 +31,13 @@ func main() {
 
 	v := validator.New(validator.WithRequiredStructEnabled())
 
+	node, err := snowflake.NewNode(1)
+	if err != nil {
+		panic(err)
+	}
+
 	dao := dao.New(dbConn)
-	repo := repo.NewUrlShortenerRepo(dao)
+	repo := repo.NewUrlShortenerRepo(dao, node)
 	svc := service.NewUrlShortenerSvc(repo)
 	url := web.NewUrlShortenerHdl(v, svc)
 
